@@ -1,4 +1,5 @@
-using System;
+using ProductListManagementSystem.Exceptions;
+using ProductListManagementSystem.Models;
 using ProductListManagementSystem.Services;
 
 namespace ProductListManagementSystem.UI;
@@ -7,39 +8,63 @@ namespace ProductListManagementSystem.UI;
 public class ConsoleUI
 {
     ProductManager manager = new ProductManager();
-public void Run()
+    public void Run()
     {
-        Console.WriteLine("**** PRODUCT LIST APPLICATION ****");
-        while(true){
-            Console.WriteLine("Enter a Number");
+        Console.WriteLine("**** PRODUCT LIST APPLICATION ****\n");
+        bool run = true;
+        while (run)
+        {
             Console.WriteLine("1-Add a Product");
             Console.WriteLine("2-Search a Product");
             Console.WriteLine("3-List Products");
             Console.WriteLine("0-Quit");
 
-            Console.Write("Enter a Number");
-            string userInput = Console.ReadLine();
-                switch (userInput)
+
+            string menuOption = InputHelper.ReadText("Select Option 0-3: ", "Menu option can't be empty");
+            switch (menuOption)
+            {
+                case "1":
+                    InputHelper.ShowInfo("\nTo enter a new product - follow the steps | To quit - enter 'Q'\n");
+                    try
                     {
-                        case "1":
-                            manager.AddProduct();
-                            break;
-                        case "2":
-                            manager.SearchProduct();
-                            break;
-                        case "3":
-                            manager.ListProducts();
-                            break;
-                        case "0":
-                            Console.WriteLine("Thank you for using this application");
-                            break;
+                        string category = InputHelper.ReadTextOrCancel("Enter Category: ", "Product Category can't be empty");
+                        string name = InputHelper.ReadTextOrCancel("Enter Product name: ", "Product name can't be empty");
+                        decimal price = InputHelper.ReadPrice("Enter Price: ", "Price can't be empty", "Product price should be grater then 0");
+                        manager.AddProduct(new Product(category, name, price));
+                        InputHelper.ShowSuccess("The product was succesfully added!\n ");
+                        break;
+                    }
+                    catch (UserCancelledException e)
+                    {
+                        InputHelper.ShowError(e.Message);
+                    }
+                    break;
+                case "2":
+                    manager.SearchProduct();
+                    break;
+                case "3":
+                    manager.ListProducts();
+                    break;
+                case "0":
+                    InputHelper.ShowSuccess("Thank you for using this application");
+                    run = false;
+                    break;
 
-                        default:
-                            Console.WriteLine("Invalid Selection");
-                            //ShowMainMenu();
-                            break;
-}
+                default:
+                    InputHelper.ShowError("Invalid selection\n");
+                    //ShowMainMenu();
+                    break;
+            }
 
-}
+
+        }
     }
+    void ExitFromAddProduct(string input)
+    {
+        if (input.Equals("q"))
+        {
+            return;
+        }
+    }
+
 }

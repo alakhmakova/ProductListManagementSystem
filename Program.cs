@@ -1,2 +1,5 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using ProductListManagementSystem.UI;
+
+ConsoleUI console = new ConsoleUI();
+
+console.Run();

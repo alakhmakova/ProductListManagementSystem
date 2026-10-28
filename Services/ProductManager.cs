@@ -1,4 +1,3 @@
-using System;
 using ProductListManagementSystem.Models;
 
 namespace ProductListManagementSystem.Services;
@@ -6,21 +5,22 @@ namespace ProductListManagementSystem.Services;
 //holds the product list and works with it
 public class ProductManager
 {
-//Index was outside of the bounds of the Array IndexOutOfRangeException
-List<Product> products = new List<Product>();
-public void AddProduct()
-{
-System.Console.WriteLine("The product was successfully added.");
-}
+    //Index was outside of the bounds of the Array IndexOutOfRangeException
 
-public void SearchProduct()
+    private readonly List<Product> _products = new();
+    public void AddProduct(Product product)
+    {
+        _products.Add(product);
+    }
 
-{
-System.Console.WriteLine("Results: ");
-}
+    public void SearchProduct()
 
-public void ListProducts()
-{
-System.Console.WriteLine("Products: ");
-}
+    {
+        Console.WriteLine("Results: ");
+    }
+
+    public void ListProducts()
+    {
+        Console.WriteLine("Products: ");
+    }
 }

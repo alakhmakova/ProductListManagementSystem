@@ -1,19 +1,17 @@
-using System;
-
 namespace ProductListManagementSystem.Models;
 
 //data for a single product
 public class Product
 {
-    public Product(string catigory, string name, decimal price)
+    public Product(string category, string name, decimal price)
     {
-        Catigory = catigory;
+        Catigory = category;
         Name = name;
         Price = price;
     }
 
-public string Catigory { get; set; }
-public string Name { get; set; }
-public decimal Price { get; set; }
+    public string Catigory { get; set; }
+    public string Name { get; set; }
+    public decimal Price { get; set; }
 
 }
