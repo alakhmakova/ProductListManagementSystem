@@ -10,10 +10,11 @@ public class ConsoleUI
     ProductManager manager = new ProductManager();
     public void Run()
     {
-        Console.WriteLine("**** PRODUCT LIST APPLICATION ****\n");
+        Console.WriteLine("**** PRODUCT LIST APPLICATION ****");
         bool run = true;
         while (run)
         {
+            Console.WriteLine("");
             Console.WriteLine("1-Add a Product");
             Console.WriteLine("2-Search a Product");
             Console.WriteLine("3-List Products");
@@ -27,23 +28,26 @@ public class ConsoleUI
                     InputHelper.ShowInfo("\nTo enter a new product - follow the steps | To quit - enter 'Q'\n");
                     try
                     {
-                        string category = InputHelper.ReadTextOrCancel("Enter Category: ", "Product Category can't be empty");
-                        string name = InputHelper.ReadTextOrCancel("Enter Product name: ", "Product name can't be empty");
-                        decimal price = InputHelper.ReadPrice("Enter Price: ", "Price can't be empty", "Product price should be grater then 0");
-                        manager.AddProduct(new Product(category, name, price));
-                        InputHelper.ShowSuccess("The product was succesfully added!\n ");
-                        break;
+                        while (true)
+                        {
+                            string category = InputHelper.ReadTextOrCancel("Enter Category: ", "Product Category can't be empty");
+                            string name = InputHelper.ReadTextOrCancel("Enter Product name: ", "Product name can't be empty");
+                            decimal price = InputHelper.ReadPrice("Enter Price: ", "Price can't be empty", "Product price should be grater then 0");
+                            manager.AddProduct(new Product(category, name, price));
+                            InputHelper.ShowSuccess("The product was succesfully added!\n ");
+                            continue;
+                        }
                     }
                     catch (UserCancelledException e)
                     {
-                        InputHelper.ShowError(e.Message);
+                        InputHelper.ShowInfo(e.Message);
                     }
                     break;
                 case "2":
                     manager.SearchProduct();
                     break;
                 case "3":
-                    manager.ListProducts();
+                    try { manager.ListProducts(); } catch (EmptyListException e) { InputHelper.ShowInfo(e.Message); }
                     break;
                 case "0":
                     InputHelper.ShowSuccess("Thank you for using this application");
