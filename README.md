@@ -38,8 +38,8 @@ ProductListManagement/
 
 ## Levels completed
 
-- [ ] Level 1 – Basic product list
-- [ ] Level 2 – Multiple classes & price summary
+- [x] Level 1 – Basic product list
+- [x] Level 2 – Multiple classes & price summary
 - [ ] Level 3 – Error handling & dynamic product management
 - [ ] Level 4 – Search & highlight
 
