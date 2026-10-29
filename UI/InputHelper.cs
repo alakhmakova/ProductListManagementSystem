@@ -90,4 +90,11 @@ public static class InputHelper
         Console.ResetColor();
     }
 
+    public static void ShowWarning(string message)
+    {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine(message);
+        Console.ResetColor();
+    }
+
 }

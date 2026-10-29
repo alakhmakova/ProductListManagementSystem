@@ -7,7 +7,12 @@ namespace ProductListManagementSystem.UI;
 //menu, table output, colors
 public class ConsoleUI
 {
-    ProductManager manager = new ProductManager();
+    // private: not accessible outside this class
+    // readonly: can't be replaced after creation, so the product list is never lost
+    // _manager: naming convention for private fields
+    private readonly ProductManager _manager = new();
+    private const int SeparatorCount = 2; // syblos | in the table
+    private const int ColumnPadding = 2; // extra spaces added to each column width
     public void Run()
     {
         Console.WriteLine("**** PRODUCT LIST APPLICATION ****");
@@ -25,7 +30,9 @@ public class ConsoleUI
             switch (menuOption)
             {
                 case "1":
-                    InputHelper.ShowInfo("\nTo enter a new product - follow the steps | To quit - enter 'Q'\n");
+                    InputHelper.ShowInfo(new string('-', 63));
+                    InputHelper.ShowInfo("To enter a new product - follow the steps | To quit - enter 'Q'");
+                    InputHelper.ShowInfo(new string('-', 63));
                     try
                     {
                         while (true)
@@ -33,24 +40,39 @@ public class ConsoleUI
                             string category = InputHelper.ReadTextOrCancel("Enter Category: ", "Product Category can't be empty");
                             string name = InputHelper.ReadTextOrCancel("Enter Product name: ", "Product name can't be empty");
                             decimal price = InputHelper.ReadPrice("Enter Price: ", "Price can't be empty", "Product price should be grater then 0");
-                            manager.AddProduct(new Product(category, name, price));
+                            _manager.AddProduct(new Product(category, name, price));
                             InputHelper.ShowSuccess("The product was succesfully added!\n ");
                             continue;
                         }
                     }
                     catch (UserCancelledException e)
                     {
-                        InputHelper.ShowInfo(e.Message);
+                        InputHelper.ShowWarning(e.Message);
                     }
                     break;
                 case "2":
-                    manager.SearchProduct();
                     break;
                 case "3":
-                    try { manager.ListProducts(); } catch (EmptyListException e) { InputHelper.ShowInfo(e.Message); }
+                    try
+                    {
+                        var products = _manager.GetProductsSortedByPrice();
+                        var (categoryWidth, nameWidth, priceWidth) = GetColumnWidths(products);
+                        int tableWidth = categoryWidth + nameWidth + priceWidth + SeparatorCount;
+                        InputHelper.ShowInfo(new string('-', tableWidth));
+                        InputHelper.ShowInfo("Category".PadRight(categoryWidth) + " " + "Product name".PadRight(nameWidth) + " " + "Price".PadLeft(priceWidth));
+                        InputHelper.ShowInfo(new string('-', tableWidth));
+                        ListProducts(products, categoryWidth, nameWidth, priceWidth);
+                        System.Console.WriteLine();
+                        InputHelper.ShowInfo($"Total: {_manager.CalculateTotal()}".PadLeft(tableWidth));
+                        InputHelper.ShowInfo(new string('-', tableWidth));
+                    }
+                    catch (EmptyListException e)
+                    {
+                        InputHelper.ShowWarning(e.Message);
+                    }
                     break;
                 case "0":
-                    InputHelper.ShowSuccess("Thank you for using this application");
+                    InputHelper.ShowInfo("Thank you for using this application");
                     run = false;
                     break;
 
@@ -63,12 +85,28 @@ public class ConsoleUI
 
         }
     }
-    void ExitFromAddProduct(string input)
+    public void ListProducts(List<Product> products, int categoryWidth, int nameWidth, int priceWidth)
     {
-        if (input.Equals("q"))
+        //empty list + table formatting
+        if (products.Count > 0)
         {
-            return;
+            foreach (Product product in products)
+            {
+                Console.WriteLine(product.Category.PadRight(categoryWidth) + " " + product.Name.PadRight(nameWidth) + " " + Convert.ToString(product.Price).PadLeft(priceWidth));
+            }
         }
+        else { throw new EmptyListException(); }
+    }
+    public (int Category, int Name, int Price) GetColumnWidths(List<Product> products)
+    {
+        if (products.Count > 0)
+        {
+            int categoryMax = Math.Max("Category".Length, products.Max(p => p.Category.Length)) + ColumnPadding;
+            int nameMax = Math.Max("Product name".Length, products.Max(p => p.Name.Length)) + ColumnPadding;
+            int priceMax = Math.Max("Price".Length, products.Max(p => Convert.ToString(p.Price).Length)) + ColumnPadding;
+            return (categoryMax, nameMax, priceMax);
+        }
+        else { throw new EmptyListException(); }
     }
 
 }

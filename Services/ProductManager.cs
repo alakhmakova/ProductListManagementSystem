@@ -18,28 +18,32 @@ public class ProductManager
     public void SearchProduct()
 
     {
-        Console.WriteLine("Results: ");
+        /*
+        A) Search Function
+            Allow users to search for products by:
+                • Product Name 
+                • Category 
+        B) Highlight Searched Product
+            When a product is found:
+                • Highlight it using console colors 
+        */
     }
 
-    public void ListProducts()
+    public List<Product> GetProductsSortedByPrice()
     {
-        //empty list + table formatting
-        if (_products.Count > 0)
-        {
-            //Sort products from lowest to highest price
-            List<Product> sortedProducts = _products.OrderBy(p => p.Price).ToList();
-            InputHelper.ShowInfo("Category".PadRight(20) + "|" + "Product name".PadRight(20) + "|" + "Price");
-            foreach (Product product in sortedProducts)
-            {
-                Console.WriteLine(product.Category.PadRight(20) + "|" + product.Name.PadRight(20) + "|" + product.Price);
-            }
-        }
-        else
-        {
-            throw new EmptyListException();
-        }
+
+        //Sort products from lowest to highest price. 
+        // List can be empty
+        return _products.OrderBy(p => p.Price).ToList();
+
+
     }
 
+    public decimal CalculateTotal()
+    {
+        //If the list is empty sum = 0
+        return _products.Sum(p => p.Price);
+    }
 
 
 }
