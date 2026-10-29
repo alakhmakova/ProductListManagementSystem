@@ -5,7 +5,7 @@ namespace ProductListManagementSystem.Exceptions;
 public class ValidationException : Exception
 {
     public ValidationException()
-        : base("Invalid product name.\n") { }
+        : base("Invalid product.\n") { }
 
     public ValidationException(string message)
         : base(message) { }

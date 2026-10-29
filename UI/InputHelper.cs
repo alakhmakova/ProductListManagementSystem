@@ -1,4 +1,5 @@
 using ProductListManagementSystem.Exceptions;
+using ProductListManagementSystem.Models;
 
 namespace ProductListManagementSystem.UI;
 
@@ -56,7 +57,7 @@ public static class InputHelper
             {
                 throw new UserCancelledException();
             }
-            else if (Decimal.TryParse(userInput, out decimal price) && price > 0)
+            else if (Decimal.TryParse(userInput, out decimal price) && Product.IsValidPrice(price))
             {
                 return price;
 

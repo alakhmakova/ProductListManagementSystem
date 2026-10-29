@@ -39,7 +39,7 @@ public class ConsoleUI
                         {
                             string category = InputHelper.ReadTextOrCancel("Enter Category: ", "Product Category can't be empty");
                             string name = InputHelper.ReadTextOrCancel("Enter Product name: ", "Product name can't be empty");
-                            decimal price = InputHelper.ReadPrice("Enter Price: ", "Price can't be empty", "Product price should be grater then 0");
+                            decimal price = InputHelper.ReadPrice("Enter Price: ", "Price can't be empty", "Price must be a number greater than 0 with at most 2 decimals");
                             _manager.AddProduct(new Product(category, name, price));
                             InputHelper.ShowSuccess("The product was succesfully added!\n ");
                             continue;
