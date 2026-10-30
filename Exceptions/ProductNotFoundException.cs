@@ -2,14 +2,14 @@ using System;
 
 namespace ProductListManagementSystem.Exceptions;
 // How to create user defined exceptions https://learn.microsoft.com/en-us/dotnet/standard/exceptions/how-to-create-user-defined-exceptions
-public class ProductNotFoundException : Exception
+public class ProductsNotFoundException : Exception
 {
-    public ProductNotFoundException()
-        : base("Product not found.\n") { }
+    public ProductsNotFoundException()
+        : base("Products not found.\n") { }
 
-    public ProductNotFoundException(string message)
+    public ProductsNotFoundException(string message)
         : base(message) { }
 
-    public ProductNotFoundException(string message, Exception innerException)
+    public ProductsNotFoundException(string message, Exception innerException)
         : base(message, innerException) { }
 }

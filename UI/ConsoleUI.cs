@@ -11,7 +11,7 @@ public class ConsoleUI
     // readonly: can't be replaced after creation, so the product list is never lost
     // _manager: naming convention for private fields
     private readonly ProductManager _manager = new();
-    private const int SeparatorCount = 2; // syblos | in the table
+    private const int SeparatorCount = 2; // " " in the table
     private const int ColumnPadding = 2; // extra spaces added to each column width
     public void Run()
     {
@@ -41,8 +41,8 @@ public class ConsoleUI
                             string name = InputHelper.ReadTextOrCancel("Enter Product name: ", "Product name can't be empty");
                             decimal price = InputHelper.ReadPrice("Enter Price: ", "Price can't be empty", "Price must be a number greater than 0 with at most 2 decimals");
                             _manager.AddProduct(new Product(category, name, price));
-                            InputHelper.ShowSuccess("The product was succesfully added!\n ");
-                            continue;
+                            InputHelper.ShowSuccess("The product was successfully added!\n ");
+
                         }
                     }
                     catch (UserCancelledException e)
@@ -51,25 +51,42 @@ public class ConsoleUI
                     }
                     break;
                 case "2":
+
+                    if (!_manager.HasProducts)
+                    {
+                        InputHelper.ShowWarning("No products to search yet. Add a product first.");
+                    }
+                    else
+                    {
+                        InputHelper.ShowInfo(new string('-', 63));
+                        InputHelper.ShowInfo("Search by product name or category | To quit - enter 'Q'");
+                        InputHelper.ShowInfo(new string('-', 63));
+                        try
+                        {
+                            while (true)
+                            {
+                                try
+                                {
+                                    string search = InputHelper.ReadTextOrCancel("Search: ", "Search string can't be empty");
+                                    DisplayProductsTable(_manager.SearchProduct(search));
+                                }
+                                catch (ProductsNotFoundException e) { InputHelper.ShowWarning(e.Message); }
+                            }
+                        }
+                        catch (UserCancelledException e) { InputHelper.ShowWarning(e.Message); }
+
+
+
+                    }
                     break;
                 case "3":
-                    try
+                    if (_manager.HasProducts)
                     {
-                        var products = _manager.GetProductsSortedByPrice();
-                        var (categoryWidth, nameWidth, priceWidth) = GetColumnWidths(products);
-                        int tableWidth = categoryWidth + nameWidth + priceWidth + SeparatorCount;
-                        InputHelper.ShowInfo(new string('-', tableWidth));
-                        InputHelper.ShowInfo("Category".PadRight(categoryWidth) + " " + "Product name".PadRight(nameWidth) + " " + "Price".PadLeft(priceWidth));
-                        InputHelper.ShowInfo(new string('-', tableWidth));
-                        ListProducts(products, categoryWidth, nameWidth, priceWidth);
-                        System.Console.WriteLine();
+                        int tableWidth = DisplayProductsTable(_manager.GetProductsSortedByPrice());
                         InputHelper.ShowInfo($"Total: {_manager.CalculateTotal()}".PadLeft(tableWidth));
                         InputHelper.ShowInfo(new string('-', tableWidth));
                     }
-                    catch (EmptyListException e)
-                    {
-                        InputHelper.ShowWarning(e.Message);
-                    }
+                    else { InputHelper.ShowWarning("Your product list is empty."); }
                     break;
                 case "0":
                     InputHelper.ShowInfo("Thank you for using this application");
@@ -85,28 +102,33 @@ public class ConsoleUI
 
         }
     }
-    public void ListProducts(List<Product> products, int categoryWidth, int nameWidth, int priceWidth)
+
+    private int DisplayProductsTable(List<Product> products)
     {
-        //empty list + table formatting
-        if (products.Count > 0)
-        {
-            foreach (Product product in products)
-            {
-                Console.WriteLine(product.Category.PadRight(categoryWidth) + " " + product.Name.PadRight(nameWidth) + " " + Convert.ToString(product.Price).PadLeft(priceWidth));
-            }
-        }
-        else { throw new EmptyListException(); }
+        var widths = GetColumnWidths(products);
+        int tableWidth = widths.Category + widths.Name + widths.Price + SeparatorCount;
+        InputHelper.ShowInfo(new string('-', tableWidth));
+        InputHelper.ShowInfo("Category".PadRight(widths.Category) + " " + "Product name".PadRight(widths.Name) + " " + "Price".PadLeft(widths.Price));
+        InputHelper.ShowInfo(new string('-', tableWidth));
+        ListProducts(products, widths.Category, widths.Name, widths.Price);
+        InputHelper.ShowInfo(new string('-', tableWidth));
+        return tableWidth;
     }
-    public (int Category, int Name, int Price) GetColumnWidths(List<Product> products)
+    private void ListProducts(List<Product> products, int categoryWidth, int nameWidth, int priceWidth)
     {
-        if (products.Count > 0)
+        foreach (Product product in products)
         {
-            int categoryMax = Math.Max("Category".Length, products.Max(p => p.Category.Length)) + ColumnPadding;
-            int nameMax = Math.Max("Product name".Length, products.Max(p => p.Name.Length)) + ColumnPadding;
-            int priceMax = Math.Max("Price".Length, products.Max(p => Convert.ToString(p.Price).Length)) + ColumnPadding;
-            return (categoryMax, nameMax, priceMax);
+            Console.WriteLine(product.Category.PadRight(categoryWidth) + " " + product.Name.PadRight(nameWidth) + " " + Convert.ToString(product.Price).PadLeft(priceWidth));
         }
-        else { throw new EmptyListException(); }
+
+    }
+    private (int Category, int Name, int Price) GetColumnWidths(List<Product> products)
+    {
+        int categoryMax = Math.Max("Category".Length, products.Max(p => p.Category.Length)) + ColumnPadding;
+        int nameMax = Math.Max("Product name".Length, products.Max(p => p.Name.Length)) + ColumnPadding;
+        int priceMax = Math.Max("Price".Length, products.Max(p => Convert.ToString(p.Price).Length)) + ColumnPadding;
+        return (categoryMax, nameMax, priceMax);
+
     }
 
 }

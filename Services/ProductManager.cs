@@ -10,23 +10,24 @@ public class ProductManager
     //Index was outside of the bounds of the Array IndexOutOfRangeException
 
     private readonly List<Product> _products = new();
+    // Computed property: has no stored value, recalculated on every read.
+    public bool HasProducts => _products.Count > 0;
     public void AddProduct(Product product)
     {
         _products.Add(product);
     }
 
-    public void SearchProduct()
-
+    public List<Product> SearchProduct(string search)
     {
-        /*
-        A) Search Function
-            Allow users to search for products by:
-                • Product Name 
-                • Category 
-        B) Highlight Searched Product
-            When a product is found:
-                • Highlight it using console colors 
-        */
+        List<Product> found = _products
+        .Where(p => p.Name.Contains(search, StringComparison.OrdinalIgnoreCase) || p.Category.Contains(search, StringComparison.OrdinalIgnoreCase)) // Case-insensitive search by partial product name using LINQ 
+        .ToList();
+
+        if (found.Count == 0)
+        {
+            throw new ProductsNotFoundException();
+        }
+        return found;
     }
 
     public List<Product> GetProductsSortedByPrice()
