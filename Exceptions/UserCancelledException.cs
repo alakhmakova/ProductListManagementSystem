@@ -2,6 +2,7 @@ using System;
 
 namespace ProductListManagementSystem.Exceptions;
 
+// Thrown when the user enters q to cancel
 public class UserCancelledException : Exception
 {
     public UserCancelledException()

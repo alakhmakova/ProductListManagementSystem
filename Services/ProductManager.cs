@@ -3,18 +3,20 @@ using ProductListManagementSystem.Models;
 
 namespace ProductListManagementSystem.Services;
 
-//holds the product list and works with it
+// Stores the products in a List and does all work on it
 public class ProductManager
 {
     private readonly List<Product> _products = new();
-    // Computed property: has no stored value, recalculated on every read.
+    // True if the list is not empty (computed on every read)
     public bool HasProducts => _products.Count > 0;
+    // Add a product to the list
     public void AddProduct(Product product)
     {
         _products.Add(product);
     }
 
-    public List<Product> SearchProduct(string search) //by name or category
+    // Search by part of name or category, case-insensitive
+    public List<Product> SearchProduct(string search)
     {
         List<Product> found = _products
         .Where(p => p.Name.Contains(search, StringComparison.OrdinalIgnoreCase) || p.Category.Contains(search, StringComparison.OrdinalIgnoreCase))
@@ -27,22 +29,22 @@ public class ProductManager
         return found;
     }
 
+    // Products sorted from lowest to highest price
     public List<Product> GetProductsSortedByPrice()
     {
 
-        //Sort products from lowest to highest price. 
-        // List can be empty
         return _products.OrderBy(p => p.Price).ToList();
 
 
     }
 
+    // Total price of all products, 0 for an empty list
     public decimal CalculateTotal()
     {
-        //If the list is empty sum = 0
         return _products.Sum(p => p.Price);
     }
 
+    // Replace the list with products loaded from the file
     public void LoadProducts(List<Product> products)
     {
         _products.Clear();// readonly forbids replacing the list, but its contents can still change

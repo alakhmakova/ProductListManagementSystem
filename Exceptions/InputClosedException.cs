@@ -2,6 +2,7 @@ using System;
 
 namespace ProductListManagementSystem.Exceptions;
 // How to create user defined exceptions https://learn.microsoft.com/en-us/dotnet/standard/exceptions/how-to-create-user-defined-exceptions
+// Thrown when console input is closed (ReadLine returns null)
 public class InputClosedException : Exception
 {
     public InputClosedException()

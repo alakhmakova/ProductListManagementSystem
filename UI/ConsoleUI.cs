@@ -4,23 +4,25 @@ using ProductListManagementSystem.Services;
 
 namespace ProductListManagementSystem.UI;
 
-//menu, table output, colors
+// Console UI: menu, input, tables, colors; the only class that prints and catches errors
 public class ConsoleUI
 {
-    // private: not accessible outside this class
-    // readonly: can't be replaced after creation, so the product list is never lost
-    // _manager: naming convention for private fields
+    // Logic and file storage; readonly, so they are never replaced
     private readonly ProductManager _manager = new();
     private readonly ProductFileStorage _storage = new("products.json");
-    private const int SeparatorCount = 2; // " " in the table
+    private const int SeparatorCount = 2; // spaces between the 3 table columns
     private const int ColumnPadding = 2; // extra spaces added to each column width
     public void Run()
     {
-        Console.WriteLine("**** PRODUCT LIST APPLICATION ****");
+        InputHelper.ShowInfo(new string('*', 24));
+        InputHelper.ShowInfo("PRODUCT LIST APPLICATION");
+        InputHelper.ShowInfo(new string('*', 24));
+        // Load saved products on start
         LoadProductsFromFile();
         bool run = true;
         try
         {
+            // Menu-based system: repeat until the user enters 0
             while (run)
             {
                 Console.WriteLine("");
@@ -30,8 +32,10 @@ public class ConsoleUI
                 Console.WriteLine("0-Quit");
 
                 string menuOption = InputHelper.ReadText("Select Option 0-3: ", "Menu option can't be empty");
+
                 switch (menuOption)
                 {
+                    // Add products until the user enters q
                     case "1":
                         InputHelper.ShowInfo(new string('-', 63));
                         InputHelper.ShowInfo("To enter a new product - follow the steps | To quit - enter 'Q'");
@@ -54,6 +58,7 @@ public class ConsoleUI
                             InputHelper.ShowWarning(e.Message);
                         }
                         break;
+                    // Search by name or category until the user enters q
                     case "2":
 
                         if (!_manager.HasProducts)
@@ -83,6 +88,7 @@ public class ConsoleUI
 
                         }
                         break;
+                    // Sorted list with the total price at the bottom
                     case "3":
                         if (_manager.HasProducts)
                         {
@@ -97,9 +103,9 @@ public class ConsoleUI
                         run = false;
                         break;
 
+                    // Invalid menu option
                     default:
                         InputHelper.ShowError("Invalid menu option. Select 0-3.");
-                        //ShowMainMenu();
                         break;
                 }
 
@@ -109,14 +115,13 @@ public class ConsoleUI
         // Rare case in interactive use: Console.ReadLine() returns null only when the input stream is closed:
         // - the user presses Ctrl+Z and then Enter (Windows) or Ctrl+D (Linux, macOS);
         // - the input is redirected from a text file instead of the keyboard (dotnet run < input.txt)
-        //   and the file ends without the 0 (Quit) command, so there are no more lines to read.
-        // Not related to products.json: the data file is read by ProductFileStorage, not by Console.ReadLine().
         catch (InputClosedException e)
         {
             InputHelper.ShowWarning(e.Message);
         }
     }
 
+    // Print products as a table; returns the table width for the Total line
     private int DisplayProductsTable(List<Product> products)
     {
         var widths = GetColumnWidths(products);
@@ -128,6 +133,7 @@ public class ConsoleUI
         InputHelper.ShowInfo(new string('-', tableWidth));
         return tableWidth;
     }
+    // One row per product
     private void ListProducts(List<Product> products, int categoryWidth, int nameWidth, int priceWidth)
     {
         foreach (Product product in products)
@@ -136,6 +142,7 @@ public class ConsoleUI
         }
 
     }
+    // Column width = longest value or header + padding
     private (int Category, int Name, int Price) GetColumnWidths(List<Product> products)
     {
         int categoryMax = Math.Max("Category".Length, products.Max(p => p.Category.Length)) + ColumnPadding;
@@ -145,6 +152,7 @@ public class ConsoleUI
 
     }
 
+    // Load products from the file; on error start with an empty list
     private void LoadProductsFromFile()
     {
         try
@@ -155,10 +163,15 @@ public class ConsoleUI
             {
                 InputHelper.ShowSuccess($"{productsLoaded.Count} products loaded from file");
             }
+            else
+            {
+                InputHelper.ShowSuccess("No saved products found. Starting with an empty list.");
+            }
         }
         catch (DataFileException e) { InputHelper.ShowWarning(e.Message + " Starting with an empty list."); }
     }
 
+    // Save all products; show an error if the file can't be written
     private void SaveProductsToFile()
     {
         try

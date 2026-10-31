@@ -3,9 +3,10 @@ using ProductListManagementSystem.Models;
 
 namespace ProductListManagementSystem.UI;
 
-//reads and validates user input
+// Reads and validates user input; prints colored messages
 public static class InputHelper
 {
+    // Ask until the user enters non-empty text
     public static string ReadText(string prompt, string emptyInputMessage)
     {
         while (true)
@@ -31,6 +32,7 @@ public static class InputHelper
 
     }
 
+    // Like ReadText, but "q" cancels the current operation
     public static string ReadTextOrCancel(string prompt, string emptyInputMessage)
     {
         string userInput = ReadText(prompt, emptyInputMessage);
@@ -41,11 +43,13 @@ public static class InputHelper
         return userInput;
     }
 
+    // Ask until the price is valid
     public static decimal ReadPrice(string prompt, string emptyInputMessage, string invalidPriceMessage)
     {
         while (true)
         {
             string userInput = ReadTextOrCancel(prompt, emptyInputMessage);
+            // Not a number, <= 0 or more than 2 decimals -> ask again
             if (Decimal.TryParse(userInput, out decimal price) && Product.IsValidPrice(price))
             {
                 return price;
@@ -59,6 +63,7 @@ public static class InputHelper
         }
     }
 
+    // Colored messages: red = error, green = success, blue = info, yellow = warning
     public static void ShowError(string message)
     {
         Console.ForegroundColor = ConsoleColor.Red;
