@@ -3,7 +3,7 @@ namespace ProductListManagementSystem.Exceptions;
 public class DataFileException : Exception
 {
     public DataFileException()
-        : base("Data file error.\n") { }
+        : base("Data file error.") { }
 
     public DataFileException(string message)
         : base(message) { }

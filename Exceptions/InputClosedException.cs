@@ -5,7 +5,7 @@ namespace ProductListManagementSystem.Exceptions;
 public class InputClosedException : Exception
 {
     public InputClosedException()
-        : base("Input stream was closed. No more input can be read.\n") { }
+        : base("Input stream was closed. No more input can be read.") { }
 
     public InputClosedException(string message)
         : base(message) { }

@@ -1,17 +1,17 @@
 # Product List Management System
 
-A C# console application for managing a list of products. You can add products, see them in a table sorted by price with a total sum, and search by product name or category.
+A C# console application for managing a list of products. You can add products, see them in a table sorted by price with a total sum, search by product name or category, and keep your products between runs in a JSON file.
 
 ## Description
 
-The app is built for a warehouse administrator who keeps track of products and their prices. It was written as a course assignment (Checkpoint 2) to practise object-oriented programming, LINQ, input validation and custom exceptions in C#.
+The app is built for a warehouse administrator who keeps track of products and their prices. It was written as a course assignment (Checkpoint 2) to practise object-oriented programming, LINQ, input validation, custom exceptions and working with files (JSON serialization) in C#.
 
 The code is split into layers, so that each class has one job:
 
 - **Models** – `Product` holds the data of one product and validates it in its constructor.
-- **Services** – `ProductManager` stores the product list and does the work on it: adding, sorting, searching and calculating the total. It never writes to the console.
+- **Services** – `ProductManager` stores the product list and does the work on it: adding, sorting, searching and calculating the total. `ProductFileStorage` saves the list to a JSON file and loads it back. Neither of them writes to the console.
 - **UI** – `ConsoleUI` shows the menu and the tables and catches errors; `InputHelper` reads and validates user input and prints colored messages.
-- **Exceptions** – custom exceptions (`ValidationException`, `ProductsNotFoundException`, `UserCancelledException`, `InputClosedException`) carry error messages from the logic to the UI.
+- **Exceptions** – custom exceptions (`ValidationException`, `ProductsNotFoundException`, `UserCancelledException`, `InputClosedException`, `DataFileException`) carry error messages from the logic to the UI.
 
 ### Features
 
@@ -19,6 +19,7 @@ The code is split into layers, so that each class has one job:
 - **Input validation** – empty category or name is rejected; the price must be a number greater than 0 with at most 2 decimals. On invalid input the app asks again instead of crashing.
 - **List products** – all products in a table, sorted from lowest to highest price, with the total at the bottom. Column widths adjust to the longest value.
 - **Search** – by part of the product name or category, case-insensitive (`mouse` finds `Mouse`). Search again or type `Q` to go back to the menu.
+- **Save & load** – every new product is saved to `products.json` right away, and the list is loaded automatically when the app starts. If the file is missing (first run), the app starts with an empty list; if the file is corrupted or contains invalid data, the app shows a message and starts with an empty list instead of crashing.
 - **Colored messages** – green for success, red for errors, yellow for warnings, blue for information.
 
 ## Getting started
@@ -35,12 +36,15 @@ cd ProductListManagementSystem
 dotnet run
 ```
 
+The products are stored in `products.json` in the folder the app is started from (the project folder when you use `dotnet run`). The file is listed in `.gitignore`, so your data is not committed.
+
 ## How to use
 
-After start, the main menu is shown. Type the number of an option and press Enter.
+After start, the app loads the saved products and shows the main menu. Type the number of an option and press Enter.
 
 ```
 **** PRODUCT LIST APPLICATION ****
+2 products loaded from file
 
 1-Add a Product
 2-Search a Product
@@ -117,9 +121,11 @@ ProductListManagementSystem/
 │   ├── InputClosedException.cs       ← input stream was closed (Ctrl+Z)
 │   ├── ProductNotFoundException.cs   ← search found nothing
 │   ├── UserCancelledException.cs     ← user typed Q
-│   └── ValidationException.cs        ← invalid product data
+│   ├── ValidationException.cs        ← invalid product data
+│   └── DataFileException.cs          ← data file can't be read or written
 ├── Services/
-│   └── ProductManager.cs             ← holds the product list and works with it
+│   ├── ProductManager.cs             ← holds the product list and works with it
+│   └── ProductFileStorage.cs         ← saves and loads products (JSON)
 └── UI/
     ├── ConsoleUI.cs                  ← menu, table output, error handling
     └── InputHelper.cs                ← reads and validates input, colored messages
@@ -131,6 +137,7 @@ ProductListManagementSystem/
 - [x] Level 2 – Multiple classes & price summary
 - [x] Level 3 – Error handling & dynamic product management
 - [x] Level 4 – Search
+- [x] Save & load products from a JSON file
 
 ## Credits
 

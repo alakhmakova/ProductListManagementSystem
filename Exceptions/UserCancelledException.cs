@@ -5,7 +5,7 @@ namespace ProductListManagementSystem.Exceptions;
 public class UserCancelledException : Exception
 {
     public UserCancelledException()
-        : base("User cancelled the operation.\n") { }
+        : base("User cancelled the operation.") { }
 
     public UserCancelledException(string message)
         : base(message) { }

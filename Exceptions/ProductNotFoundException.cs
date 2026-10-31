@@ -5,7 +5,7 @@ namespace ProductListManagementSystem.Exceptions;
 public class ProductsNotFoundException : Exception
 {
     public ProductsNotFoundException()
-        : base("Products not found.\n") { }
+        : base("Products not found.") { }
 
     public ProductsNotFoundException(string message)
         : base(message) { }

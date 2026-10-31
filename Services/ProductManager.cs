@@ -6,8 +6,6 @@ namespace ProductListManagementSystem.Services;
 //holds the product list and works with it
 public class ProductManager
 {
-    //Index was outside of the bounds of the Array IndexOutOfRangeException
-
     private readonly List<Product> _products = new();
     // Computed property: has no stored value, recalculated on every read.
     public bool HasProducts => _products.Count > 0;
@@ -16,10 +14,10 @@ public class ProductManager
         _products.Add(product);
     }
 
-    public List<Product> SearchProduct(string search)
+    public List<Product> SearchProduct(string search) //by name or category
     {
         List<Product> found = _products
-        .Where(p => p.Name.Contains(search, StringComparison.OrdinalIgnoreCase) || p.Category.Contains(search, StringComparison.OrdinalIgnoreCase)) // Case-insensitive search by partial product name using LINQ 
+        .Where(p => p.Name.Contains(search, StringComparison.OrdinalIgnoreCase) || p.Category.Contains(search, StringComparison.OrdinalIgnoreCase))
         .ToList();
 
         if (found.Count == 0)
@@ -43,6 +41,12 @@ public class ProductManager
     {
         //If the list is empty sum = 0
         return _products.Sum(p => p.Price);
+    }
+
+    public void LoadProducts(List<Product> products)
+    {
+        _products.Clear();// readonly forbids replacing the list, but its contents can still change
+        _products.AddRange(products);
     }
 
 

@@ -33,31 +33,20 @@ public static class InputHelper
 
     public static string ReadTextOrCancel(string prompt, string emptyInputMessage)
     {
-        while (true)
+        string userInput = ReadText(prompt, emptyInputMessage);
+        if (userInput.Equals("q", StringComparison.OrdinalIgnoreCase))
         {
-            string userInput = ReadText(prompt, emptyInputMessage);
-            if (userInput.Equals("q", StringComparison.OrdinalIgnoreCase))
-            {
-                throw new UserCancelledException();
-            }
-            else
-            {
-                return userInput;
-            }
-
+            throw new UserCancelledException();
         }
+        return userInput;
     }
 
     public static decimal ReadPrice(string prompt, string emptyInputMessage, string invalidPriceMessage)
     {
         while (true)
         {
-            string userInput = ReadText(prompt, emptyInputMessage);
-            if (userInput.Equals("q", StringComparison.OrdinalIgnoreCase))
-            {
-                throw new UserCancelledException();
-            }
-            else if (Decimal.TryParse(userInput, out decimal price) && Product.IsValidPrice(price))
+            string userInput = ReadTextOrCancel(prompt, emptyInputMessage);
+            if (Decimal.TryParse(userInput, out decimal price) && Product.IsValidPrice(price))
             {
                 return price;
 
