@@ -29,17 +29,16 @@ public class ConsoleUI
                 Console.WriteLine("1-Add a Product");
                 Console.WriteLine("2-Search a Product");
                 Console.WriteLine("3-List Products");
+                Console.WriteLine("4-Delete a Product");
                 Console.WriteLine("0-Quit");
 
-                string menuOption = InputHelper.ReadText("Select Option 0-3: ", "Menu option can't be empty");
+                string menuOption = InputHelper.ReadText("Select Option 0-4: ", "Menu option can't be empty");
 
                 switch (menuOption)
                 {
                     // Add products until the user enters q
                     case "1":
-                        InputHelper.ShowInfo(new string('-', 63));
-                        InputHelper.ShowInfo("To enter a new product - follow the steps | To quit - enter 'Q'");
-                        InputHelper.ShowInfo(new string('-', 63));
+                        ShowHeader("To enter a new product - follow the steps | To quit - enter 'Q'");
                         try
                         {
                             while (true)
@@ -67,9 +66,7 @@ public class ConsoleUI
                         }
                         else
                         {
-                            InputHelper.ShowInfo(new string('-', 63));
-                            InputHelper.ShowInfo("Search by product name or category | To quit - enter 'Q'");
-                            InputHelper.ShowInfo(new string('-', 63));
+                            ShowHeader("Search by product name or category | To quit - enter 'Q'");
                             try
                             {
                                 while (true)
@@ -96,6 +93,43 @@ public class ConsoleUI
                         }
                         else { InputHelper.ShowWarning("Your product list is empty."); }
                         break;
+                    // Delete by id: show the product, ask to confirm; repeat until the user enters q
+                    case "4":
+                        if (!_manager.HasProducts)
+                        {
+                            InputHelper.ShowWarning("No products to delete yet. Add a product first.");
+                        }
+                        else
+                        {
+                            ShowHeader("Enter the id of the product to delete | To quit - enter 'Q'");
+                            try
+                            {
+                                // Stop when there is nothing left to delete
+                                while (_manager.HasProducts)
+                                {
+                                    try
+                                    {
+                                        int id = InputHelper.ReadId("Enter product id to delete: ", "Product id can't be empty", "Product id must be a whole number greater than 0");
+                                        Product product = _manager.GetProductById(id);
+                                        DisplayProductsTable(new List<Product> { product });
+                                        if (InputHelper.ReadYesNo("Delete this product? (y/n): ", "Answer can't be empty", "Please enter y or n"))
+                                        {
+                                            _manager.DeleteProductById(id);
+                                            SaveProductsToFile();
+                                            InputHelper.ShowSuccess("The product was successfully deleted!\n ");
+                                        }
+                                        else
+                                        {
+                                            InputHelper.ShowWarning("The product was not deleted.\n ");
+                                        }
+                                    }
+                                    catch (ProductsNotFoundException e) { InputHelper.ShowWarning(e.Message); }
+                                }
+                                InputHelper.ShowWarning("Your product list is empty.");
+                            }
+                            catch (UserCancelledException e) { InputHelper.ShowWarning(e.Message); }
+                        }
+                        break;
                     case "0":
                         InputHelper.ShowInfo("Thank you for using this application");
                         run = false;
@@ -103,7 +137,7 @@ public class ConsoleUI
 
                     // Invalid menu option
                     default:
-                        InputHelper.ShowError("Invalid menu option. Select 0-3.");
+                        InputHelper.ShowError("Invalid menu option. Select 0-4.");
                         break;
                 }
 
@@ -117,6 +151,14 @@ public class ConsoleUI
         {
             InputHelper.ShowWarning(e.Message);
         }
+    }
+
+    // Text between two dash lines of the same length
+    private void ShowHeader(string text)
+    {
+        InputHelper.ShowInfo(new string('-', text.Length));
+        InputHelper.ShowInfo(text);
+        InputHelper.ShowInfo(new string('-', text.Length));
     }
 
     // Print products as a table; shows the Total line only if total is given

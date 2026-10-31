@@ -48,6 +48,23 @@ public class ProductManager
         return _products.Sum(p => p.Price);
     }
 
+    // Find the product with this id; throws if there is no such id
+    public Product GetProductById(int id)
+    {
+        Product? product = _products.FirstOrDefault(p => p.Id == id); // null if not found
+        if (product == null)
+        {
+            throw new ProductsNotFoundException($"Product with id {id} not found.");
+        }
+        return product;
+    }
+
+    // Remove the product with this id; throws if there is no such id
+    public void DeleteProductById(int id)
+    {
+        _products.Remove(GetProductById(id));
+    }
+
     // Products and next id, ready to be saved
     public ProductData GetData()
     {

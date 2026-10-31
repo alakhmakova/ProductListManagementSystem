@@ -63,6 +63,38 @@ public static class InputHelper
         }
     }
 
+    // Ask until the id is a whole number greater than 0
+    public static int ReadId(string prompt, string emptyInputMessage, string invalidIdMessage)
+    {
+        while (true)
+        {
+            string userInput = ReadTextOrCancel(prompt, emptyInputMessage);
+            if (int.TryParse(userInput, out int id) && id > 0)
+            {
+                return id;
+            }
+            ShowError(invalidIdMessage);
+        }
+    }
+
+    // Ask until the answer is y/yes (true) or n/no (false)
+    public static bool ReadYesNo(string prompt, string emptyInputMessage, string invalidAnswerMessage)
+    {
+        while (true)
+        {
+            string answer = ReadText(prompt, emptyInputMessage).ToLower();
+            if (answer == "y" || answer == "yes")
+            {
+                return true;
+            }
+            if (answer == "n" || answer == "no")
+            {
+                return false;
+            }
+            ShowError(invalidAnswerMessage);
+        }
+    }
+
     // Colored messages: red = error, green = success, blue = info, yellow = warning
     public static void ShowError(string message)
     {
