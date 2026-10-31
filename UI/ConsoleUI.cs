@@ -92,9 +92,7 @@ public class ConsoleUI
                     case "3":
                         if (_manager.HasProducts)
                         {
-                            int tableWidth = DisplayProductsTable(_manager.GetProductsSortedByPrice());
-                            InputHelper.ShowInfo($"Total: {_manager.CalculateTotal()}".PadLeft(tableWidth));
-                            InputHelper.ShowInfo(new string('-', tableWidth));
+                            DisplayProductsTable(_manager.GetProductsSortedByPrice(), _manager.CalculateTotal());
                         }
                         else { InputHelper.ShowWarning("Your product list is empty."); }
                         break;
@@ -121,8 +119,8 @@ public class ConsoleUI
         }
     }
 
-    // Print products as a table; returns the table width for the Total line
-    private int DisplayProductsTable(List<Product> products)
+    // Print products as a table; shows the Total line only if total is given
+    private void DisplayProductsTable(List<Product> products, decimal? total = null)
     {
         var widths = GetColumnWidths(products);
         int tableWidth = widths.Category + widths.Name + widths.Price + SeparatorCount;
@@ -131,8 +129,14 @@ public class ConsoleUI
         InputHelper.ShowInfo(new string('-', tableWidth));
         ListProducts(products, widths.Category, widths.Name, widths.Price);
         InputHelper.ShowInfo(new string('-', tableWidth));
-        return tableWidth;
+
+        if (total.HasValue)
+        {
+            InputHelper.ShowInfo($"Total: {total.Value}".PadLeft(tableWidth));
+            InputHelper.ShowInfo(new string('-', tableWidth));
+        }
     }
+
     // One row per product
     private void ListProducts(List<Product> products, int categoryWidth, int nameWidth, int priceWidth)
     {
