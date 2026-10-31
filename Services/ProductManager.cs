@@ -7,11 +7,15 @@ namespace ProductListManagementSystem.Services;
 public class ProductManager
 {
     private readonly List<Product> _products = new();
+    // Next id to give out; ids are never reused, even after a delete
+    private int _nextId = 1;
     // True if the list is not empty (computed on every read)
     public bool HasProducts => _products.Count > 0;
-    // Add a product to the list
+    // Give the product the next id and add it to the list
     public void AddProduct(Product product)
     {
+        product.Id = _nextId;
+        _nextId++;
         _products.Add(product);
     }
 
@@ -44,11 +48,20 @@ public class ProductManager
         return _products.Sum(p => p.Price);
     }
 
-    // Replace the list with products loaded from the file
-    public void LoadProducts(List<Product> products)
+    // Products and next id, ready to be saved
+    public ProductData GetData()
     {
-        _products.Clear();// readonly forbids replacing the list, but its contents can still change
-        _products.AddRange(products);
+        return new ProductData { NextId = _nextId, Products = GetProductsSortedByPrice() };
+    }
+
+    // Replace the list and the next id with data loaded from the file
+    public void LoadData(ProductData data)
+    {
+        _products.Clear(); // readonly forbids replacing the list, but its contents can still change
+        _products.AddRange(data.Products);
+        // Never below the biggest existing id + 1, even if the file was edited by hand
+        int maxId = _products.Count > 0 ? _products.Max(p => p.Id) : 0;
+        _nextId = Math.Max(data.NextId, maxId + 1);
     }
 
 

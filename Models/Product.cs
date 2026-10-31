@@ -1,7 +1,7 @@
 using ProductListManagementSystem.Exceptions;
 namespace ProductListManagementSystem.Models;
 
-// Data for one product (category, name, price)
+// Data for one product (id, category, name, price)
 public class Product
 {
     // Validates data, so an invalid product can never be created
@@ -25,6 +25,8 @@ public class Product
 
     }
 
+    // Set by ProductManager when the product is added
+    public int Id { get; set; }
     public string Category { get; set; }
     public string Name { get; set; }
     public decimal Price { get; set; }

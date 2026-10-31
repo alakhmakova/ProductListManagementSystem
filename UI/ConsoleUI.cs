@@ -10,7 +10,7 @@ public class ConsoleUI
     // Logic and file storage; readonly, so they are never replaced
     private readonly ProductManager _manager = new();
     private readonly ProductFileStorage _storage = new("products.json");
-    private const int SeparatorCount = 2; // spaces between the 3 table columns
+    private const int SeparatorCount = 3; // spaces between the 4 table columns
     private const int ColumnPadding = 2; // extra spaces added to each column width
     public void Run()
     {
@@ -123,11 +123,11 @@ public class ConsoleUI
     private void DisplayProductsTable(List<Product> products, decimal? total = null)
     {
         var widths = GetColumnWidths(products);
-        int tableWidth = widths.Category + widths.Name + widths.Price + SeparatorCount;
+        int tableWidth = widths.Id + widths.Category + widths.Name + widths.Price + SeparatorCount;
         InputHelper.ShowInfo(new string('-', tableWidth));
-        InputHelper.ShowInfo("Category".PadRight(widths.Category) + " " + "Product name".PadRight(widths.Name) + " " + "Price".PadLeft(widths.Price));
+        InputHelper.ShowInfo("Id".PadRight(widths.Id) + " " + "Category".PadRight(widths.Category) + " " + "Product name".PadRight(widths.Name) + " " + "Price".PadLeft(widths.Price));
         InputHelper.ShowInfo(new string('-', tableWidth));
-        ListProducts(products, widths.Category, widths.Name, widths.Price);
+        ListProducts(products, widths.Id, widths.Category, widths.Name, widths.Price);
         InputHelper.ShowInfo(new string('-', tableWidth));
 
         if (total.HasValue)
@@ -138,21 +138,22 @@ public class ConsoleUI
     }
 
     // One row per product
-    private void ListProducts(List<Product> products, int categoryWidth, int nameWidth, int priceWidth)
+    private void ListProducts(List<Product> products, int idWidth, int categoryWidth, int nameWidth, int priceWidth)
     {
         foreach (Product product in products)
         {
-            Console.WriteLine(product.Category.PadRight(categoryWidth) + " " + product.Name.PadRight(nameWidth) + " " + Convert.ToString(product.Price).PadLeft(priceWidth));
+            Console.WriteLine(product.Id.ToString().PadRight(idWidth) + " " + product.Category.PadRight(categoryWidth) + " " + product.Name.PadRight(nameWidth) + " " + Convert.ToString(product.Price).PadLeft(priceWidth));
         }
 
     }
     // Column width = longest value or header + padding
-    private (int Category, int Name, int Price) GetColumnWidths(List<Product> products)
+    private (int Id, int Category, int Name, int Price) GetColumnWidths(List<Product> products)
     {
+        int idMax = Math.Max("Id".Length, products.Max(p => p.Id.ToString().Length)) + ColumnPadding;
         int categoryMax = Math.Max("Category".Length, products.Max(p => p.Category.Length)) + ColumnPadding;
         int nameMax = Math.Max("Product name".Length, products.Max(p => p.Name.Length)) + ColumnPadding;
         int priceMax = Math.Max("Price".Length, products.Max(p => Convert.ToString(p.Price).Length)) + ColumnPadding;
-        return (categoryMax, nameMax, priceMax);
+        return (idMax, categoryMax, nameMax, priceMax);
 
     }
 
@@ -161,11 +162,11 @@ public class ConsoleUI
     {
         try
         {
-            List<Product> productsLoaded = _storage.Load();
-            _manager.LoadProducts(productsLoaded);
-            if (productsLoaded.Count > 0)
+            ProductData data = _storage.Load();
+            _manager.LoadData(data);
+            if (data.Products.Count > 0)
             {
-                InputHelper.ShowSuccess($"{productsLoaded.Count} products loaded from file");
+                InputHelper.ShowSuccess($"{data.Products.Count} products loaded from file");
             }
             else
             {
@@ -180,7 +181,7 @@ public class ConsoleUI
     {
         try
         {
-            _storage.Save(_manager.GetProductsSortedByPrice());
+            _storage.Save(_manager.GetData());
         }
         catch (DataFileException e) { InputHelper.ShowError(e.Message); }
     }

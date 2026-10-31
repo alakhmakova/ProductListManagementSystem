@@ -16,19 +16,19 @@ public class ProductFileStorage
         _filePath = filePath;
     }
 
-    // Write all products to the file (serialization)
-    public void Save(List<Product> products)
+    // Write products and next id to the file (serialization)
+    public void Save(ProductData data)
     {
         try
         {
-            string json = JsonSerializer.Serialize(products, _jsonOptions);
+            string json = JsonSerializer.Serialize(data, _jsonOptions);
             File.WriteAllText(_filePath, json);
         }
         catch (IOException e) { throw new DataFileException("Could not save products.", e); }
         catch (UnauthorizedAccessException e) { throw new DataFileException("Could not save products. Access denied.", e); }
     }
-    // Read products from the file (deserialization)
-    public List<Product> Load()
+    // Read products and next id from the file (deserialization)
+    public ProductData Load()
     {
         try
         {
@@ -39,8 +39,8 @@ public class ProductFileStorage
 
             string fromFile = File.ReadAllText(_filePath);
             // The Product constructor runs here, so invalid data is rejected
-            List<Product>? loaded = JsonSerializer.Deserialize<List<Product>>(fromFile);
-            return loaded ?? new(); // "null" in the file -> empty list
+            ProductData? loaded = JsonSerializer.Deserialize<ProductData>(fromFile);
+            return loaded ?? new(); // "null" in the file -> empty data
         }
         catch (JsonException e) { throw new DataFileException("Could not load products. The data file is corrupted.", e); }
         catch (IOException e) { throw new DataFileException("Could not load products.", e); }
